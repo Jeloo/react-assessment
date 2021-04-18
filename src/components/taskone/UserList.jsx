@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import debounce from '@components/common/utils/debounce';
 
 const Row = styled.div`
   display: flex;
@@ -7,7 +8,7 @@ const Row = styled.div`
   margin-bottom: 10px;
   border: 1px solid #000;
   padding: 20px;
-  
+
   span {
     display: block;
     margin-bottom: 5px;
@@ -26,66 +27,48 @@ const Users = styled.div`
   margin-top: 15px;
 `;
 
-const debounce = (func, wait = 5000) => {
-  let timeout = null;
+const UserList = () => {
+  const [filter, setFilter] = useState('');
+  const [data, setData] = useState();
+  const [userName, setUserName] = useState('');
+  // const [dataError, setDataError] = useState('');
 
-  const cleanup = () => {
-    if (timeout) clearTimeout(timeout);
-  };
-
-  return () => {
-    cleanup();
-
-    timeout = setTimeout(func, wait);
-  };
-};
-
-export default class UserList extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      data: [],
-      filter: '',
-      value: ''
-    };
-  }
-
-  componentDidMount() {
-    this.fetchData();
-  }
-
-  fetchData = () => {
-    const { filter } = this.state;
-    fetch(`https://jsonplaceholder.typicode.com/users${filter ? `?username=${encodeURIComponent(filter)}` : ''}`).then(async (response) => {
-      const data = await response.json();
-      this.setState({ data });
+  const fetchData = useCallback(() => {
+    fetch(
+      `https://jsonplaceholder.typicode.com/users${
+        filter ? `?username=${encodeURIComponent(filter)}` : ''
+      }`
+    ).then(async (response) => {
+      // @TODO Add try/catch
+      setData(await response.json());
     });
-  }
+  }, [filter]);
 
-  render() {
-    const { data, value } = this.state;
+  const applyFilter = (e) => {
+    setUserName(e.target.value);
+    const debounceFn = debounce(() => {
+      setFilter(e.target.value);
+    });
 
-    const setFilter = (e) => {
-      this.setState({ value: e.target.value });
-      const debounceFn = debounce((e) => {
-        this.setState({ filter: e.target.value }, this.fetchData);
-      });
+    debounceFn();
+  };
 
-      debounceFn(e);
-    };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-    return (
+  return (
+    <div>
       <div>
-        <div>
-          Filter:
-          <input
-            type="text"
-            onChange={setFilter}
-            value={value}
-            placeholder="Enter username"
-          />
-        </div>
+        Filter:
+        <input
+          type="text"
+          onChange={applyFilter}
+          value={userName}
+          placeholder="Enter username"
+        />
+      </div>
+      {data ? (
         <Users>
           {data.map((user) => (
             <Row key={user.id}>
@@ -108,7 +91,11 @@ export default class UserList extends Component {
             </Row>
           ))}
         </Users>
-      </div>
-    );
-  }
-}
+      ) : (
+        'Waiting...'
+      )}
+    </div>
+  );
+};
+
+export default UserList;

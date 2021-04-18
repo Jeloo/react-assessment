@@ -8,15 +8,8 @@ const App = () => (
   <Router>
     <Nav />
     <Switch>
-      <Route
-        path="/"
-        exact
-        component={TaskOne}
-      />
-      <Route
-        path="/task-two"
-        component={TaskTwo}
-      />
+      <Route path="/" exact component={TaskOne} />
+      <Route path="/task-two" component={TaskTwo} />
     </Switch>
   </Router>
 );
