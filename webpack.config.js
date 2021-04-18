@@ -37,8 +37,8 @@ module.exports = {
         enforce: 'pre',
         options: {
           cache: false,
-          fix: true
-        }
+          fix: true,
+        },
       },
       {
         test: /\.(jsx|js|es6)$/,
