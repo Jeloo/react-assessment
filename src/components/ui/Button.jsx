@@ -58,6 +58,7 @@ const Button = styled.button`
   height: auto;
   outline: none;
   cursor: pointer;
+  opacity: ${({ disabled = false }) => (disabled ? '0.3' : '1')};
   ${({ fadeIn }) => fadeIn && fadeInMixin}
 `;
 

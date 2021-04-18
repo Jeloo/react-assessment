@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import useHistory from '@components/report/useHistory';
 import Modal from '../modal';
 import { ColorType, Size } from '../ui/theme';
 import ButtonDefault from '../ui/Button';
@@ -23,6 +24,8 @@ const ModalDemo = () => {
   const {
     showModal, closeModal, isShown, closeAll, anyShown
   } = useModals();
+
+  const { history, removeItems } = useHistory();
 
   return (
     <>
@@ -110,39 +113,46 @@ const ModalDemo = () => {
       )}
 
       {isShown(Modals.deletion) && (
-        <Modal
-          headingText="Are you sure you want to delete this report and its history?"
-          color={ColorType.danger}
-          styles={{
-            ModalWrapper: {
-              width: '500px',
-            },
-            Button: {
-              width: '100px',
-              marginLeft: '10px',
-            },
-            ModalFooter: {
-              justifyContent: 'flex-end',
-            },
-          }}
-          buttons={[
-            {
-              id: 'deleteAll',
-              text: 'Delete all',
-              colorType: ColorType.primary,
-              onClick: () => closeModal(Modals.deletion),
-            },
-            {
-              id: 'cancel',
-              text: 'Cancel',
-              colorType: ColorType.secondary,
-              onClick: () => closeModal(Modals.deletion),
-              closeOnClick: true,
-            },
-          ]}
-        >
-          <DeleteHistory />
-        </Modal>
+        <DeleteHistory data={history}>
+          {(renderHistory, confirmed, selected) => (
+            <Modal
+              headingText="Are you sure you want to delete this report and its history?"
+              color={ColorType.danger}
+              styles={{
+                ModalWrapper: {
+                  width: '500px',
+                },
+                Button: {
+                  width: '100px',
+                  marginLeft: '10px',
+                },
+                ModalFooter: {
+                  justifyContent: 'flex-end',
+                },
+              }}
+              buttons={[
+                {
+                  id: 'deleteAll',
+                  text: 'Delete all',
+                  colorType: ColorType.primary,
+                  onClick: () => {
+                    removeItems(selected);
+                  },
+                  disabled: !confirmed,
+                },
+                {
+                  id: 'cancel',
+                  text: 'Cancel',
+                  colorType: ColorType.secondary,
+                  onClick: () => closeModal(Modals.deletion),
+                  closeOnClick: true,
+                },
+              ]}
+            >
+              {renderHistory()}
+            </Modal>
+          )}
+        </DeleteHistory>
       )}
     </>
   );

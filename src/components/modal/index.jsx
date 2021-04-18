@@ -60,6 +60,7 @@ const Modal = ({
             onClick={btn.onClick}
             colorType={btn.colorType}
             style={styles?.Button}
+            disabled={btn.disabled}
           >
             {btn.text}
           </Button>
@@ -83,6 +84,7 @@ Modal.propTypes = {
       onClick: PropTypes.func,
       colorType: ColorType,
       text: PropTypes.string,
+      disabled: PropTypes.bool,
     })
   ),
   color: PropTypes.oneOf(Object.values(ColorType)),

@@ -26,9 +26,9 @@ const list = [
 const useHistory = () => {
   const [history, setHistory] = useState(list);
 
-  const removeItems = (indexes) => {
+  const removeItems = (itemsToRemove) => {
     const withRemovedItems = history.filter(
-      (value, index) => indexes.indexOf(index) === -1
+      (item) => !itemsToRemove.includes(item.title)
     );
 
     setHistory(withRemovedItems);

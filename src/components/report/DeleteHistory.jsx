@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { ColorType, palette, Size } from '../ui/theme';
 import TextDefault, { BoldInnerText } from '../ui/Text';
-import useHistory from './useHistory';
 
 const Select = styled.select`
   width: 100%;
@@ -17,24 +17,53 @@ const Notification = styled(TextDefault)`
   padding: 10px 0;
 `;
 
-const DeleteHistory = () => {
-  const { history: list } = useHistory();
+const confirmationKeyword = 'Delete';
 
-  return (
+const DeleteHistory = ({ data, children }) => {
+  const [confirmed, setConfirmed] = useState(false);
+  const [value, setValue] = useState('');
+  const [selected, setSelected] = useState([]);
+
+  const handleSelection = (e) => {
+    setSelected(Array.from(e.target.selectedOptions, (option) => option.value));
+  };
+
+  useEffect(() => {
+    setConfirmed(value === confirmationKeyword);
+  }, [value]);
+
+  const render = () => (
     <>
-      <Select multiple>
-        {list.map((item) => (
+      <Select multiple onChange={handleSelection}>
+        {data.map((item) => (
           <Option key={item.id}>{item.title}</Option>
         ))}
       </Select>
       <Notification size={Size.x05}>
-        Please type the word &apos;Delete&apos; to remove the
+        Please type the word &apos;
+        {confirmationKeyword}
+        &apos; to remove the
         <BoldInnerText> Executive metrics </BoldInnerText>
         report and its associated history
       </Notification>
-      <input type="text" />
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
     </>
   );
+
+  return children(render, confirmed, selected);
+};
+
+DeleteHistory.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      title: PropTypes.string,
+    })
+  ).isRequired,
 };
 
 export default DeleteHistory;
