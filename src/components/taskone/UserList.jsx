@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import debounce from '@components/common/utils/debounce';
+import useFetch from '../../common/hooks/useFetch';
+import useDebounce from '../../common/hooks/useDebounce';
 
 const Row = styled.div`
   display: flex;
@@ -28,47 +29,43 @@ const Users = styled.div`
 `;
 
 const UserList = () => {
-  const [filter, setFilter] = useState('');
-  const [data, setData] = useState();
   const [userName, setUserName] = useState('');
-  // const [dataError, setDataError] = useState('');
+  const debouncedUserName = useDebounce(userName, 5000);
 
-  const fetchData = useCallback(() => {
-    fetch(
-      `https://jsonplaceholder.typicode.com/users${
-        filter ? `?username=${encodeURIComponent(filter)}` : ''
-      }`
-    ).then(async (response) => {
-      // @TODO Add try/catch
-      setData(await response.json());
-    });
-  }, [filter]);
+  const {
+    data, fetchData, pending, error
+  } = useFetch();
 
-  const applyFilter = (e) => {
-    setUserName(e.target.value);
-    const debounceFn = debounce(() => {
-      setFilter(e.target.value);
-    });
-
-    debounceFn();
-  };
+  const fetchInput = `https://jsonplaceholder.typicode.com/users${
+    userName ? `?username=${encodeURIComponent(userName)}` : ''
+  }`;
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchData(fetchInput);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedUserName]);
+
+  if (error) {
+    return (
+      <div>
+        An error occurred:
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <>
       <div>
         Filter:
         <input
           type="text"
-          onChange={applyFilter}
+          onChange={(e) => setUserName(e.target.value)}
           value={userName}
           placeholder="Enter username"
         />
       </div>
-      {data ? (
+      {data && !pending ? (
         <Users>
           {data.map((user) => (
             <Row key={user.id}>
@@ -94,7 +91,7 @@ const UserList = () => {
       ) : (
         'Waiting...'
       )}
-    </div>
+    </>
   );
 };
 
