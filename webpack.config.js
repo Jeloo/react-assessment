@@ -36,7 +36,8 @@ module.exports = {
         loader: 'eslint-loader',
         enforce: 'pre',
         options: {
-          cache: false
+          cache: false,
+          fix: true
         }
       },
       {

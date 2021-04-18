@@ -51,16 +51,16 @@ export default class UserList extends Component {
     };
   }
 
+  componentDidMount() {
+    this.fetchData();
+  }
+
   fetchData = () => {
     const { filter } = this.state;
     fetch(`https://jsonplaceholder.typicode.com/users${filter ? `?username=${encodeURIComponent(filter)}` : ''}`).then(async (response) => {
       const data = await response.json();
       this.setState({ data });
     });
-  }
-
-  componentDidMount() {
-    this.fetchData();
   }
 
   render() {
