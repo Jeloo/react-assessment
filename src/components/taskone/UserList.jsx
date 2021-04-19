@@ -48,7 +48,6 @@ const UserList = () => {
   if (error) {
     return (
       <div>
-        An error occurred:
         {error}
       </div>
     );
@@ -63,13 +62,14 @@ const UserList = () => {
           onChange={(e) => setUserName(e.target.value)}
           value={userName}
           placeholder="Enter username"
+          data-testid="username-input"
         />
       </div>
       {data && !pending ? (
-        <Users>
+        <Users data-testid="user-list">
           {data.map((user) => (
             <Row key={user.id}>
-              <UserInfo>
+              <UserInfo data-testid="user-info">
                 <span>{`Name: ${user.name}`}</span>
                 <span>{`Username: ${user.username}`}</span>
               </UserInfo>
